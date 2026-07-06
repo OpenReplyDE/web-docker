@@ -4,12 +4,13 @@ import { ref } from "vue";
 
 defineProps<{ msg: string }>();
 
-initialize({});
+initialize({logEvents: true, configFilePath: '/test-config.json'});
 
 const showObservedElement = ref(false);
 const handleClick = () => {
   showObservedElement.value = !showObservedElement.value;
 };
+
 </script>
 
 <template>
@@ -18,6 +19,7 @@ const handleClick = () => {
   <div v-if="showObservedElement">
     <observed-fragment />
   </div>
+
 </template>
 
 <style>
