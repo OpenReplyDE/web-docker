@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, beforeEach } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import ModuleRegistry from "~/core/ModuleRegistry";
 import { Asset } from "~/core/Asset";
 import AssetFactory from "~/core/AssetFactory";
@@ -56,7 +56,9 @@ describe("ModuleRegistry", () => {
 
     await moduleRegistry.add(config);
 
-    expect(async () => await moduleRegistry.add(config)).rejects.toThrow();
+    await expect(
+      async () => await moduleRegistry.add(config),
+    ).rejects.toThrow();
   });
 
   it("does not allow services with similar journey names", async () => {
@@ -69,7 +71,9 @@ describe("ModuleRegistry", () => {
 
     await moduleRegistry.add(config);
 
-    expect(async () => await moduleRegistry.add(config)).rejects.toThrow();
+    await expect(
+      async () => await moduleRegistry.add(config),
+    ).rejects.toThrow();
   });
 
   it("does not allow services with duplicate assets", async () => {
@@ -100,7 +104,9 @@ describe("ModuleRegistry", () => {
 
     await moduleRegistry.add(config);
 
-    expect(async () => await moduleRegistry.add(configA)).rejects.toThrow();
+    await expect(
+      async () => await moduleRegistry.add(configA),
+    ).rejects.toThrow();
   });
 
   it("overrides service with similar module names", () => {
@@ -159,6 +165,10 @@ describe("ModuleRegistry", () => {
     const moduleRegistry = new ModuleRegistry(false, assetFactoryMock);
     // End test setup
 
-    expect(() => moduleRegistry.getByModuleName("invalid-module-name")).toThrowError("A module with name: invalid-module-name has not been registered.");
+    expect(() =>
+      moduleRegistry.getByModuleName("invalid-module-name"),
+    ).toThrowError(
+      "A module with name: invalid-module-name has not been registered.",
+    );
   });
 });

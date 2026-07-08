@@ -1,6 +1,6 @@
 import AssetFactory from "./AssetFactory";
 import { Logger } from "~/core/Logger";
-import type { IncludeType, ObservedModuleConfig } from "~/core/ModuleConfig";
+import type { ObservedModuleConfig } from "~/core/ModuleConfig";
 import { ModuleService } from "~/core/ModuleService";
 
 class ObservedModuleService implements ModuleService {
@@ -12,7 +12,7 @@ class ObservedModuleService implements ModuleService {
     private readonly assetFactory = new AssetFactory(),
     logEvents: boolean,
     private readonly documentBody = document.body,
-    private readonly documentHead = document.head
+    private readonly documentHead = document.head,
   ) {
     this.logger = new Logger("ObservedModuleService", logEvents);
     this.assetFactory = assetFactory;
