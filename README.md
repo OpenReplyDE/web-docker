@@ -55,6 +55,12 @@ logging is disabled by default. To enable logging, set the following environment
     VITE_APP_LOG_EVENTS=true
    ```
 
+### Configuration
+
+Web Docker loads modules dynamically based on a JSON configuration file. The configuration defines which modules to load, when to load them, and what assets they require.
+
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for detailed configuration guide.
+
 ### Running the Web Docker as NPM package
 
 1. Install the package
