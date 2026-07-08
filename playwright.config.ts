@@ -100,8 +100,7 @@ const config: PlaywrightTestConfig = {
 
   webServer: [
     {
-      command:
-        "npm run build:page-module && npm run build:observed-module && npm run serve:fragments",
+      command: "npm run build:fragments && npm run serve:fragments",
       url: "http://localhost:3010",
       name: "Fragments",
     },
