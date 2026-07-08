@@ -101,13 +101,15 @@ const config: PlaywrightTestConfig = {
   webServer: [
     {
       command: "npm run build:fragments && npm run serve:fragments",
-      url: "http://localhost:3010",
+      port: 3010,
       name: "Fragments",
+      reuseExistingServer: true,
     },
     {
       command: "npm run dev:test-host",
       url: "http://localhost:5173/test-host.html",
       name: "Test Host",
+      reuseExistingServer: true,
     },
   ],
 };
