@@ -1,5 +1,7 @@
+import { Config } from "@testing-library/dom";
+
 (function () {
-  const config: any[] = [];
+  const config: Config[] = [];
 
   window.addEventListener("web-docker:register", (event: Event) => {
     const customEvent = event as CustomEvent;
