@@ -2,9 +2,9 @@
   "compilerOptions": {
     "composite": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "target": "ESNext",
+    "target": "esnext",
     "paths": {
       "~/*": ["./src/*"]
     }
