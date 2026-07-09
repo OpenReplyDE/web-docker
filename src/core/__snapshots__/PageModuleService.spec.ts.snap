@@ -26,6 +26,19 @@ exports[`PageModuleService > injects assets if empty page arrays was provided 1`
 </body>
 `;
 
+exports[`PageModuleService > injects assets if hash matches page pattern 1`] = `
+<body>
+  <link />
+</body>
+`;
+
+exports[`PageModuleService > injects assets on hashchange when hash matches page pattern 1`] = `
+<body>
+  <link />
+  <link />
+</body>
+`;
+
 exports[`PageModuleService > injects assets without custom element if URL of the page matches 1`] = `
 <body>
   <link />

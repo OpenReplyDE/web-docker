@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import ModuleRegistry from "~/core/ModuleRegistry";
 import { Asset } from "~/core/Asset";
 import AssetFactory from "~/core/AssetFactory";
@@ -153,6 +153,21 @@ describe("ModuleRegistry", () => {
     // End test setup
 
     expect(moduleRegistry.getByModuleName(config.module)).toEqual(service);
+  });
+
+  it("destroy() calls remove() on all registered services", async () => {
+    const assetFactoryMock: AssetFactory = {
+      create(): (HTMLLinkElement | HTMLScriptElement)[] {
+        return [document.createElement("link")];
+      },
+    };
+    const moduleRegistry = new ModuleRegistry(false, assetFactoryMock);
+    const service = await moduleRegistry.add(config);
+    const removeSpy = vi.spyOn(service, "remove");
+
+    moduleRegistry.destroy();
+
+    expect(removeSpy).toHaveBeenCalledOnce();
   });
 
   it("throws when requested service does not exist in registry", async () => {

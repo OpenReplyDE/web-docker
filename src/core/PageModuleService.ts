@@ -105,8 +105,9 @@ class PageModuleService implements ModuleService {
   }
 
   remove(): void {
-    // no-op: PageModuleService stays loaded, hashchange listener keeps firing
-    // for lazy injection on route change
+    if (!this.loaded) {
+      window.removeEventListener("hashchange", this.hashHandler);
+    }
   }
 }
 export { PageModuleService };
