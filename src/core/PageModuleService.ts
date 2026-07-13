@@ -4,6 +4,8 @@ import type { PageInclude, PageModuleConfig } from "~/core/ModuleConfig";
 import { ModuleService } from "~/core/ModuleService";
 import { forEachSeries } from "~/core/utils";
 
+export const ROUTE_CHANGE_EVENT = "webdocker:routechange";
+
 class PageModuleService implements ModuleService {
   private readonly logger: Logger;
   private loaded = false;
@@ -19,7 +21,7 @@ class PageModuleService implements ModuleService {
     this.logger = new Logger("PageModuleService", this.logEvents);
     this.assetFactory = assetFactory;
     this.hashHandler = this.handleHashChange.bind(this);
-    window.addEventListener("hashchange", this.hashHandler);
+    this.loadListeners();
   }
 
   private async addLoadEventListeners(asset: HtmlAsset): Promise<void> {
@@ -59,7 +61,7 @@ class PageModuleService implements ModuleService {
       }
 
       this.loaded = true;
-      window.removeEventListener("hashchange", this.hashHandler);
+      this.cleanupListeners();
 
       this.logger.log("injected assets in head", headAssets);
       this.logger.log("injected assets in body", bodyAssets);
@@ -107,6 +109,17 @@ class PageModuleService implements ModuleService {
   remove(): void {
     // no-op: PageModuleService stays loaded, hashchange listener keeps firing
     // for lazy injection on route change
+  }
+
+  private loadListeners() {
+    window.addEventListener("hashchange", this.hashHandler);
+    // Custom event, Vue does not fire `hashchange` on Hash History Mode, event triggers on custom handler added to vue frontend
+    window.addEventListener(ROUTE_CHANGE_EVENT, this.hashHandler);
+  }
+
+  private cleanupListeners() {
+    window.removeEventListener("hashchange", this.hashHandler);
+    window.removeEventListener(ROUTE_CHANGE_EVENT, this.hashHandler);
   }
 }
 export { PageModuleService };
