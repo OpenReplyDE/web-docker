@@ -68,8 +68,16 @@ class ObservedModuleService implements ModuleService {
   private injectAssets(): void {
     if (this.assetsInjected) return;
 
-    const headAssets = this.assetFactory.create(this.config.assets, "head");
-    const bodyAssets = this.assetFactory.create(this.config.assets, "body");
+    const headAssets = this.assetFactory.create(
+      this.config.assets,
+      "head",
+      this.config.module,
+    );
+    const bodyAssets = this.assetFactory.create(
+      this.config.assets,
+      "body",
+      this.config.module,
+    );
     headAssets.forEach((asset) => this.documentHead.appendChild(asset));
     bodyAssets.forEach((asset) => this.documentBody.appendChild(asset));
 
