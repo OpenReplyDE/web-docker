@@ -24,11 +24,26 @@ describe("AssestFactory", () => {
       type: "css",
     };
 
-    const element = assetFactory.create([asset]);
+    const element = assetFactory.create([asset], "head", "raffle-teasers");
 
     expect(element).not.toBeNull();
 
     expect(element).toMatchSnapshot();
+  });
+
+  it("wraps css in a @import layered by module (temporary fix)", () => {
+    const assetFactory = new AssetFactory();
+    const asset: AssetLink = {
+      src: "/src/",
+      type: "css",
+    };
+
+    const [element] = assetFactory.create([asset], "head", "raffle-teasers");
+
+    expect(element.tagName).toBe("STYLE");
+    expect(element.textContent).toBe(
+      '@import url("/src/") layer(bcmf.raffle-teasers);'
+    );
   });
 
   it("constructs multiple assets of different types", () => {

@@ -40,8 +40,16 @@ class PageModuleService implements ModuleService {
       this.config.pages.length === 0 ||
       this.config.pages.some(this.matches)
     ) {
-      const headAssets = this.assetFactory.create(this.config.assets, "head");
-      const bodyAssets = this.assetFactory.create(this.config.assets, "body");
+      const headAssets = this.assetFactory.create(
+        this.config.assets,
+        "head",
+        this.config.module,
+      );
+      const bodyAssets = this.assetFactory.create(
+        this.config.assets,
+        "body",
+        this.config.module,
+      );
 
       if (this.config.exposes) {
         await forEachSeries(headAssets, async (asset) => {

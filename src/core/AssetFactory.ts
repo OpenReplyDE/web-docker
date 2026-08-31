@@ -1,6 +1,9 @@
 import { Asset, AssetLink, AssetPosition, AssetScript } from "~/core/Asset";
 
-export type HtmlAsset = HTMLLinkElement | HTMLScriptElement;
+export type HtmlAsset =
+  | HTMLLinkElement
+  | HTMLScriptElement
+  | HTMLStyleElement;
 export default class AssetFactory {
   private static buildTagScript(attr: AssetScript): HTMLScriptElement {
     const script = document.createElement("script");
@@ -19,21 +22,31 @@ export default class AssetFactory {
     return script;
   }
 
-  private static buildTagLink(attr: AssetLink): HTMLLinkElement {
-    const link = document.createElement("link");
-    link.setAttribute("rel", "stylesheet");
-    link.setAttribute("href", attr.src);
-    if (attr.media) link.setAttribute("media", attr.media);
+  // TEMPORARY FIX: fragment CSS is injected via `@import ... layer(bcmf.<module>)`
+  // inside a <style> instead of a plain <link>, so every fragment's styles land
+  // in a cascade layer that ranks below the shell's own styles. This lets the
+  // shell (Tailwind v4) win over fragments (mix of Tailwind v3 and v4) without
+  // cross-pollution, while still sharing styles. Done at runtime here so already
+  // deployed fragments need no rebuild. Requires the shell to pre-declare the
+  // layer order first: `@layer bcmf, theme, base, components, utilities;`.
+  private static buildTagLink(
+    attr: AssetLink,
+    module: string
+  ): HTMLStyleElement {
+    const style = document.createElement("style");
+    const media = attr.media ? ` ${attr.media}` : "";
+    style.textContent = `@import url("${attr.src}") layer(bcmf.${module})${media};`;
 
     if (attr.priority)
-      link.setAttribute("data-priority", attr.priority.toString());
+      style.setAttribute("data-priority", attr.priority.toString());
 
-    return link;
+    return style;
   }
 
   public create(
     assets: Asset[],
     position: AssetPosition = "head",
+    module = "",
     countryCode?: string
   ): HtmlAsset[] {
     return (
@@ -58,11 +71,11 @@ export default class AssetFactory {
       .map((entry) => {
         switch (entry.type) {
           case "css":
-            return AssetFactory.buildTagLink(entry);
+            return AssetFactory.buildTagLink(entry, module);
           case "js":
             return AssetFactory.buildTagScript(entry);
         }
       })
-      .filter((item): item is HTMLLinkElement | HTMLScriptElement => !!item);
+      .filter((item): item is HtmlAsset => !!item);
   }
 }

@@ -2,28 +2,25 @@
 
 exports[`AssestFactory > assumes default head position for assets if the asset does not specify 1`] = `
 [
-  <link
-    href="/src/"
-    rel="stylesheet"
-  />,
+  <style>
+    @import url("/src/") layer(bcmf.);
+  </style>,
 ]
 `;
 
 exports[`AssestFactory > constructs link asset 1`] = `
 [
-  <link
-    href="/src/"
-    rel="stylesheet"
-  />,
+  <style>
+    @import url("/src/") layer(bcmf.raffle-teasers);
+  </style>,
 ]
 `;
 
 exports[`AssestFactory > constructs multiple assets of different types 1`] = `
 [
-  <link
-    href="/src/"
-    rel="stylesheet"
-  />,
+  <style>
+    @import url("/src/") layer(bcmf.);
+  </style>,
   <script
     src="/src/"
     type="text/javascript"
@@ -42,11 +39,11 @@ exports[`AssestFactory > constructs script asset 1`] = `
 
 exports[`AssestFactory > creates list in order of asset priority 1`] = `
 [
-  <link
+  <style
     data-priority="2"
-    href="/src2/"
-    rel="stylesheet"
-  />,
+  >
+    @import url("/src2/") layer(bcmf.);
+  </style>,
   <script
     data-priority="1"
     src="/src/"
@@ -57,9 +54,8 @@ exports[`AssestFactory > creates list in order of asset priority 1`] = `
 
 exports[`AssestFactory > ignores the asset if it does not match the position argument 1`] = `
 [
-  <link
-    href="/src/"
-    rel="stylesheet"
-  />,
+  <style>
+    @import url("/src/") layer(bcmf.);
+  </style>,
 ]
 `;
