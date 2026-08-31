@@ -15,24 +15,29 @@ export class Webdocker {
   constructor(
     options: WebDockerOptions,
     readonly registry: ModuleRegistry = new ModuleRegistry(
-      options.logEvents ?? false
+      options.logEvents ?? false,
     ),
     readonly moduleConfigService: ModuleConfigService = new ModuleConfigService(),
     readonly remoteConfigurationService: RemoteConfigurationService = new RemoteConfigurationService(
-      options
+      options,
     ),
-    readonly scopeRegistry: Scope = new Scope(
-      options.scope ?? "webdocker"
-    )
+    readonly scopeRegistry: Scope = new Scope(options.scope ?? "webdocker"),
   ) {}
 
+  private init() {
+    window.addEventListener("pagehide", () => this.registry.destroy(), {
+      once: true,
+    });
+  }
+
   async run() {
+    this.init();
     const remoteConfigurations = await this.remoteConfigurationService.fetch();
 
     if (remoteConfigurations) {
       const reorderedPageConfigs =
         this.remoteConfigurationService.reorderPageConfigs(
-          remoteConfigurations
+          remoteConfigurations,
         );
 
       await forEachSeries(reorderedPageConfigs, async (config: Config) => {

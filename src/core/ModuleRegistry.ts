@@ -134,6 +134,10 @@ class ModuleRegistry implements ModuleRegistryInterface {
     throw Error(`No module service factory found for type: ${moduleConfig.type}`);
   }
 
+  public destroy(): void {
+    this.moduleServices.forEach((service) => service.remove());
+  }
+
   public addModuleServiceFactory({
     type,
     constructor,

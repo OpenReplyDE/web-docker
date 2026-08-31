@@ -6,6 +6,7 @@ import { ModuleService } from "~/core/ModuleService";
 class ObservedModuleService implements ModuleService {
   private readonly logger: Logger;
   private assetsInjected = false;
+  private observer: MutationObserver | null = null;
 
   constructor(
     private readonly config: ObservedModuleConfig,
@@ -60,9 +61,9 @@ class ObservedModuleService implements ModuleService {
       }
     };
 
-    const observer = new MutationObserver(callback);
+    this.observer = new MutationObserver(callback);
 
-    observer.observe(targetNode, config);
+    this.observer.observe(targetNode, config);
   }
 
   private injectAssets(): void {
@@ -88,7 +89,8 @@ class ObservedModuleService implements ModuleService {
   }
 
   remove(): void {
-    this.logger.warn("remove() is not implemented for ObservedModuleService");
+    this.observer?.disconnect();
+    this.observer = null;
   }
 }
 export { ObservedModuleService };
