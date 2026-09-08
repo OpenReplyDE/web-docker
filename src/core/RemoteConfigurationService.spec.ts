@@ -197,4 +197,112 @@ describe("RemoteConfigurationService", function () {
       use: { vue: "vue-module" },
     });
   });
+
+  it("keeps an exposing page module first even when it is last in the input", async function () {
+    const configs: Config[] = [
+      {
+        type: "page" as const,
+        pages: [],
+        version: "1.0.0",
+        assets: [],
+        module: "plain-module-1",
+      },
+      {
+        type: "page" as const,
+        pages: [],
+        version: "1.0.0",
+        assets: [],
+        module: "plain-module-2",
+      },
+      {
+        type: "page" as const,
+        pages: [],
+        version: "1.0.0",
+        assets: [],
+        module: "exposer-module",
+        exposes: { vue: "vue-module" },
+      },
+    ];
+
+    const configService = new RemoteConfigurationService({});
+
+    const reorderedConfigs = configService.reorderPageConfigs(configs);
+
+    expect(reorderedConfigs[0].module).toEqual("exposer-module");
+    expect(reorderedConfigs[1].module).toEqual("plain-module-1");
+    expect(reorderedConfigs[2].module).toEqual("plain-module-2");
+  });
+
+  it("keeps the relative input order of plain page modules with neither exposes nor use", async function () {
+    const configs: Config[] = [
+      {
+        type: "page" as const,
+        pages: [],
+        version: "1.0.0",
+        assets: [],
+        module: "plain-module-c",
+      },
+      {
+        type: "page" as const,
+        pages: [],
+        version: "1.0.0",
+        assets: [],
+        module: "plain-module-a",
+      },
+      {
+        type: "page" as const,
+        pages: [],
+        version: "1.0.0",
+        assets: [],
+        module: "plain-module-b",
+      },
+    ];
+
+    const configService = new RemoteConfigurationService({});
+
+    const reorderedConfigs = configService.reorderPageConfigs(configs);
+
+    expect(reorderedConfigs.map((config) => config.module)).toEqual([
+      "plain-module-c",
+      "plain-module-a",
+      "plain-module-b",
+    ]);
+  });
+
+  it("places non-page modules after all page modules regardless of input position", async function () {
+    const configs: Config[] = [
+      {
+        type: "observed" as const,
+        version: "1.0.0",
+        assets: [],
+        selector: "a",
+        module: "observed-module",
+      },
+      {
+        type: "page" as const,
+        pages: [],
+        version: "1.0.0",
+        assets: [],
+        module: "plain-page-module",
+      },
+      {
+        type: "page" as const,
+        pages: [],
+        version: "1.0.0",
+        assets: [],
+        module: "exposer-module",
+        exposes: { vue: "vue-module" },
+      },
+    ];
+
+    const configService = new RemoteConfigurationService({});
+
+    const reorderedConfigs = configService.reorderPageConfigs(configs);
+
+    expect(reorderedConfigs.map((config) => config.module)).toEqual([
+      "exposer-module",
+      "plain-page-module",
+      "observed-module",
+    ]);
+  });
 });

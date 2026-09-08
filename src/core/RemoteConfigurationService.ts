@@ -1,5 +1,6 @@
 import { Logger } from "~/core/Logger";
 import { Config } from "~/core/Config";
+import { PageModuleConfig } from "~/core/ModuleConfig";
 import { WebDockerOptions } from "~/core/Webdocker";
 
 class RemoteConfigurationService {
@@ -9,16 +10,16 @@ class RemoteConfigurationService {
   constructor(options: WebDockerOptions) {
     this.logger = new Logger(
       "RemoteConfigurationService",
-      options.logEvents ?? false
+      options.logEvents ?? false,
     );
     if (!options.configFilePath) {
       this.logger.log(
-        `No CONFIG_FILE_PATH has been set. Disabling web docker's remote configs.`
+        `No CONFIG_FILE_PATH has been set. Disabling web docker's remote configs.`,
       );
     } else {
       this.configFilePath = options.configFilePath;
       this.logger.log(
-        `Initializing RemoteConfigurationService with CONFIG_FILE_PATH: ${this.configFilePath}.`
+        `Initializing RemoteConfigurationService with CONFIG_FILE_PATH: ${this.configFilePath}.`,
       );
     }
   }
@@ -30,7 +31,7 @@ class RemoteConfigurationService {
     } catch (err) {
       this.logger.log(
         `Could not fetch automatic configuration from: ${configFilePath}. Returning empty array instead.`,
-        err
+        err,
       );
       return [];
     }
@@ -43,25 +44,50 @@ class RemoteConfigurationService {
   }
 
   reorderPageConfigs(configs: Config[]): Config[] {
-    return configs.sort((a, b) => {
-      if (a.type === "page" && b.type !== "page") {
-        return -1;
+    const isPage = (config: Config): config is PageModuleConfig =>
+      config.type === "page";
+    const pages = configs.filter(isPage);
+    const rest = configs.filter((config) => !isPage(config));
+    const exposers = pages.filter((page) => page.exposes);
+    const consumers = pages.filter((page) => !page.exposes);
+    return [...this.sortByExposeOrder(exposers), ...consumers, ...rest];
+  }
+
+  private sortByExposeOrder(exposers: PageModuleConfig[]): PageModuleConfig[] {
+    const sorted: PageModuleConfig[] = [];
+    const pending = [...exposers];
+
+    while (pending.length) {
+      const next = pending.findIndex(
+        (candidate) => !this.dependsOnPending(candidate, pending),
+      );
+
+      if (next === -1) {
+        sorted.push(...pending);
+        break;
       }
-      if (a.type !== "page" && b.type === "page") {
-        return 1;
+
+      sorted.push(...pending.splice(next, 1));
+    }
+
+    return sorted;
+  }
+
+  private dependsOnPending(
+    candidate: PageModuleConfig,
+    pending: PageModuleConfig[],
+  ): boolean {
+    for (const used in candidate.use) {
+      const provider = pending.some(
+        (other) => other !== candidate && other.exposes && used in other.exposes,
+      );
+
+      if (provider) {
+        return true;
       }
-      if (a.type === "page" && b.type === "page") {
-        if (!a.exposes) return 1;
-        for (const expose in a.exposes) {
-          for (const use in b.use) {
-            if (expose === use) {
-              return -1;
-            }
-          }
-        }
-      }
-      return -1;
-    });
+    }
+
+    return false;
   }
 }
 
